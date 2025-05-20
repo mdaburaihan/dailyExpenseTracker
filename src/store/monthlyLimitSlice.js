@@ -7,6 +7,8 @@ export const fetchMonthlyLimit = createAsyncThunk('fetchMonthlyLimit', async (us
     return getMonthlyData;
 });
 
+
+
 export const saveMonthlyLimit = createAsyncThunk('saveMonthlyLimit', async (data) => {
     const addMonthlyData = await appwriteService.addMonthlyLimit(data);
     return addMonthlyData;

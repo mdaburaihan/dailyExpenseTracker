@@ -145,8 +145,9 @@ export class Service{
         }
     }
 
-    async getAllExpensesByYear(user_id, year=getCurrentYear()){
+    async getAllExpensesByYear(user_id, year){
         try {
+            console.log(user_id, year)
             const queries =  [
                 Query.equal('user_id', user_id),
                 Query.equal('year', year)
@@ -158,7 +159,7 @@ export class Service{
                 queries,
             )
 
-            if(data){
+            if(data && Object.keys(data).length>0){
                 return {
                     status: true,
                     data: data

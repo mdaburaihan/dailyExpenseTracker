@@ -29,7 +29,7 @@ function MonthlyLimit() {
 
     const addUpdateLimit = (data) => {
         try {
-            if(data.amount>0){
+            if(limit_amount>0){
                 dispatch(updateMonthlyLimit({ ...data, user_id: userData.$id }));
             }else{
                 dispatch(saveMonthlyLimit({ ...data, user_id: userData.$id }));

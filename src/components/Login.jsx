@@ -17,8 +17,9 @@ function Login() {
         const session = await authService.login(data)
         if (session) {
             const userData = await authService.getCurrentUser()
-            if(userData) dispatch(authLogin(userData));
-            navigate("/")
+            console.log("===LOGIN USER DATA===", userData);
+            if(userData) dispatch(authLogin({userData}));
+            navigate("/view-expenses")
         }
     } catch (error) {
         setError(error.message)

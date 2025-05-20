@@ -16,34 +16,21 @@ function AddExpense() {
     const { loading, error, submit_sucess, success_message } = useSelector((state) => state.expense);
 
     const userData = useSelector((state) => state.auth.userData);
-    const { register, handleSubmit, watch, reset, formState: { errors, isValid } } = useForm()
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm()
+
 
     const addExpense = (data) => {
         try {
            
             dispatch(saveExpense({ ...data, user_id: userData.$id, currentMonthExpenseAmount }));
             dispatch(fetchMonthlyLimit(userData.$id));
-            
+            dispatch(fetchAllCurrentMonthExpenses(userData.$id));
             reset();
         } catch (error) {
             console.log(error)
             toast.error('Error: Something went wrong. Please try again.');
         }
     }
-
-    useEffect(() => {
-        const subscription = watch((value, { name }) => {
-            if(name === "amount"){
-                if(value.amount>limit_amount){
-                    SetAddExpenseError('You have exceeded monthly limit.');
-                }else{
-                    SetAddExpenseError(null);
-                }
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, [watch, limit_amount]);
 
     useEffect(() => {
         if (error) {
@@ -82,12 +69,14 @@ function AddExpense() {
                                 value: /^[0-9]+$/,
                                 message: "Please enter a valid numeric value",
                             },
-                            // validate: (value) => {
-                            //     if (value>limit_amount) {
-                            //       return false;
-                            //     }
-                            //     return true;
-                            // }
+                            validate: (value) => {
+                                if (value>limit_amount || value>limit_amount-currentMonthExpenseAmount) {
+                                  SetAddExpenseError('You have exceeded monthly limit.');
+                                  return "You have exceeded monthly limit.";
+                                }
+                                SetAddExpenseError(null);
+                                return true;
+                            }
                         })}
                     />
                     {errors && errors.amount && <p className="text-red-500 text-xs italic">Invalid amount</p>}
