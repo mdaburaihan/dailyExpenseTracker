@@ -29,7 +29,12 @@ const initialState = {
 const expenseSlice = createSlice({
     name: 'expenseData',
     initialState,
-    reducers: {},
+    reducers: {
+        resetAddExpenseSuccess: (state) => {
+            state.submit_sucess = false;
+            state.success_message = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(saveExpense.pending, (state) => {
@@ -80,4 +85,5 @@ const expenseSlice = createSlice({
     },
 });
 
+export const { resetAddExpenseSuccess } = expenseSlice.actions;
 export default expenseSlice.reducer;

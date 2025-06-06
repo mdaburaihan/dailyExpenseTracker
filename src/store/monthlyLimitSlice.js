@@ -7,8 +7,6 @@ export const fetchMonthlyLimit = createAsyncThunk('fetchMonthlyLimit', async (us
     return getMonthlyData;
 });
 
-
-
 export const saveMonthlyLimit = createAsyncThunk('saveMonthlyLimit', async (data) => {
     const addMonthlyData = await appwriteService.addMonthlyLimit(data);
     return addMonthlyData;
@@ -31,7 +29,12 @@ const initialState = {
 const monthlyLimitSlice = createSlice({
     name: 'monthlyLimitData',
     initialState,
-    reducers: {},
+    reducers: {
+        resetMonthlyLimitSuccess: (state) => {
+            state.submit_sucess = false;
+            state.success_message = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchMonthlyLimit.pending, (state) => {
@@ -86,4 +89,5 @@ const monthlyLimitSlice = createSlice({
     },
 });
 
+export const { resetMonthlyLimitSuccess } = monthlyLimitSlice.actions;
 export default monthlyLimitSlice.reducer;
