@@ -147,7 +147,6 @@ export class Service{
 
     async getAllExpensesByYear(user_id, year){
         try {
-            console.log(user_id, year)
             const queries =  [
                 Query.equal('user_id', user_id),
                 Query.equal('year', year)
