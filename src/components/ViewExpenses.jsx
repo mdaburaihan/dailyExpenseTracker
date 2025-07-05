@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from "react-redux";
 import { getAllExpensesByYear } from '../store/expenseSlice';
+import Pagination from './common/Pagination';
+import { PAGE_SIZE } from '../conf/constants';
 
 function ViewExpenses() {
     const dispatch = useDispatch();
     const userData = useSelector((state) => state.auth.userData);
-    const { expensesLoading, expenses } = useSelector((state) => state.expense);
-
+    const { expensesLoading, expenses, totalExpenseCount } = useSelector((state) => state.expense);
+    const pageSize = PAGE_SIZE;
+   
     const currentYear = new Date().getFullYear();
     const [expenseYear, setExpenseYear] = useState(currentYear);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const years = [];
     for (let year = currentYear; year >= 2000; year--) {
@@ -17,9 +21,19 @@ function ViewExpenses() {
 
     const handleYearChange = (event) => {
         const selectedYear = parseInt(event.target.value);
+        setCurrentPage(1);
         setExpenseYear(selectedYear);
         if (userData?.$id) {
             dispatch(getAllExpensesByYear({ userId: userData.$id, year: selectedYear }));
+        }
+    };
+
+    const onPageChange = (page) => {
+        const totalPages = Math.max(1, Math.ceil(totalExpenseCount / pageSize));
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+        if (userData?.$id) {
+            dispatch(getAllExpensesByYear({ userId: userData.$id, year: expenseYear, page: page }));
         }
     };
 
@@ -87,6 +101,12 @@ function ViewExpenses() {
                     <span className="sr-only">Loading...</span>
                 </div>
             )}
+            <Pagination 
+                totalExpenseCount={totalExpenseCount} 
+                currentPage={currentPage} 
+                onPageChange={onPageChange}
+                pageSize={pageSize}
+            />
         </div>
     )
 }

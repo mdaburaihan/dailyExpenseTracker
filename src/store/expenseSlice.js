@@ -12,7 +12,7 @@ export const fetchAllCurrentMonthExpenses = createAsyncThunk('fetchAllCurrentMon
 });
 
 export const getAllExpensesByYear = createAsyncThunk('getAllExpensesByYear', async (req) => {
-    const getAllExpenseData = await appwriteService.getAllExpensesByYear(req.userId, req.year);
+    const getAllExpenseData = await appwriteService.getAllExpensesByYear(req.userId, req.year, req.page);
     return getAllExpenseData;
 });
 
@@ -23,7 +23,8 @@ const initialState = {
     success_message: null,
     currentMonthExpenseAmount: 0,
     expensesLoading: true,
-    expenses: []
+    expenses: [],
+    totalExpenseCount: 0
 }
 
 const expenseSlice = createSlice({
@@ -74,8 +75,10 @@ const expenseSlice = createSlice({
                 state.expensesLoading = false;
                 if (action.payload.status && action.payload.data?.documents && action.payload.data.documents.length>0) {
                     state.expenses = action.payload.data.documents;
+                    state.totalExpenseCount = action.payload.data.total;
                 }else{
                     state.expenses = [];
+                    state.totalExpenseCount = 0;
                 }
             })
             .addCase(getAllExpensesByYear.rejected, (state, action) => {

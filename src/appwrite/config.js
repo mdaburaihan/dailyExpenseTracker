@@ -145,11 +145,14 @@ export class Service{
         }
     }
 
-    async getAllExpensesByYear(user_id, year){
+    async getAllExpensesByYear(user_id, year, page=1){
         try {
+            const offset = (page - 1) * 5;
             const queries =  [
                 Query.equal('user_id', user_id),
-                Query.equal('year', year)
+                Query.equal('year', year),
+                Query.limit(5),
+                Query.offset(offset)
             ]
 
             const data = await this.databases.listDocuments(

@@ -13,7 +13,7 @@ const authSlice = createSlice({
             state.status = true;
             state.userData = action.payload.userData;
             localStorage.setItem('userData', action.payload.userData);
-            //expire in 1 minutre from current time
+            //expire in 10 minutes from current time
             const expiryTime = new Date(Date.now() + 60 * 1000).toISOString();
             localStorage.setItem('userDataExpiry', expiryTime);
         },

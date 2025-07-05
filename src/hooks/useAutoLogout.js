@@ -24,7 +24,7 @@ export default function useAutoLogout() {
 
         checkExpiry(); // Immediate check
 
-        const interval = setInterval(checkExpiry, 60 * 1000);
+        const interval = setInterval(checkExpiry, 60 * 10000);
 
         return () => clearInterval(interval);
     }, [dispatch, navigate, isLoggedIn]);
