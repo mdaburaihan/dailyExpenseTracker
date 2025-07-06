@@ -127,7 +127,7 @@ function AddExpense() {
                     <input
                         id="file"
                         type="file"
-                        accept="image/png, image/jpg, image/jpeg, image/gif"
+                        accept="image/png, image/jpg, image/jpeg, image/gif, application/pdf"
                         className="hidden"
                         {...register("receipt", {
                             onChange: (e) => {

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from "react-redux";
-import { getAllExpensesByYear } from '../store/expenseSlice';
+import { getAllExpensesByYear, downloadExpenseReceipt } from '../store/expenseSlice';
 import Pagination from './common/Pagination';
+import { ToastContainer, toast } from 'react-toastify';
 import { PAGE_SIZE } from '../conf/constants';
 
 function ViewExpenses() {
@@ -9,7 +10,7 @@ function ViewExpenses() {
     const userData = useSelector((state) => state.auth.userData);
     const { expensesLoading, expenses, totalExpenseCount } = useSelector((state) => state.expense);
     const pageSize = PAGE_SIZE;
-   
+
     const currentYear = new Date().getFullYear();
     const [expenseYear, setExpenseYear] = useState(currentYear);
     const [currentPage, setCurrentPage] = useState(1);
@@ -36,6 +37,15 @@ function ViewExpenses() {
             dispatch(getAllExpensesByYear({ userId: userData.$id, year: expenseYear, page: page }));
         }
     };
+
+    const handleReceiptDownload = (fileId) => {
+        let receiptDownload = dispatch(downloadExpenseReceipt(fileId))
+        if(receiptDownload?.payload){
+            window.open(resp.payload, "_blank");
+        }else{
+            toast.error('Error downloading receipt. Please try again later.');
+        }   
+    }
 
     useEffect(() => {
         if (userData?.$id) {
@@ -75,16 +85,26 @@ function ViewExpenses() {
                                     <th scope="col" className="px-6 py-3">Time</th>
                                     <th scope="col" className="px-6 py-3">Amount</th>
                                     <th scope="col" className="px-6 py-3">Reason</th>
+                                    <th scope="col" className="px-6 py-3">Receipt</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {expenses.map((item) => (
-                                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200" key={item.$id || item.$updatedAt}>
+                                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200" key={item.$id}>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            {item.$updatedAt}
+                                           {new Date(item.$updatedAt).toLocaleString()}
                                         </th>
                                         <td className="px-6 py-4">{item.amount}</td>
                                         <td className="px-6 py-4">{item.reason}</td>
+                                        <td className="px-6 py-4">
+                                            {item.fileId ? (
+                                                <button onClick={()=>handleReceiptDownload(item.fileId)} className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                                                    Download
+                                                </button>
+                                            ) : (
+                                                "-"
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -101,12 +121,13 @@ function ViewExpenses() {
                     <span className="sr-only">Loading...</span>
                 </div>
             )}
-            <Pagination 
-                totalExpenseCount={totalExpenseCount} 
-                currentPage={currentPage} 
+            <Pagination
+                totalExpenseCount={totalExpenseCount}
+                currentPage={currentPage}
                 onPageChange={onPageChange}
                 pageSize={pageSize}
             />
+            <ToastContainer />
         </div>
     )
 }

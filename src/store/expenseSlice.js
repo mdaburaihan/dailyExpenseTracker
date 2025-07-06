@@ -45,6 +45,10 @@ const expenseSlice = createSlice({
             state.receiptUploadStatus = null;
             state.receiptUploadError = null;
             state.receiptFileId = null;
+        },
+        downloadExpenseReceipt: (state, action) => {
+            const receiptDownloadedData = appwriteService.getFileDownload(action.payload);
+            action.payload = receiptDownloadedData;
         }
     },
     extraReducers: (builder) => {
@@ -113,5 +117,5 @@ const expenseSlice = createSlice({
     },
 });
 
-export const { resetAddExpenseSuccess } = expenseSlice.actions;
+export const { resetAddExpenseSuccess, downloadExpenseReceipt } = expenseSlice.actions;
 export default expenseSlice.reducer;
