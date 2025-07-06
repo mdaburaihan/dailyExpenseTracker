@@ -1,5 +1,5 @@
 import conf from '../conf/conf.js';
-import { Client, Databases, Storage, Query } from "appwrite";
+import { Client, Databases, Storage, Query, ID } from "appwrite";
 import { v4 as uuid } from "uuid";
 import { getMonthlyLimitSlug, getCurrentYear, getCurrentMonth } from '../utils/utils'
 
@@ -181,7 +181,7 @@ export class Service{
         }
     }
 
-    async addExpense({user_id, amount, reason, currentMonthExpenseAmount}){
+    async addExpense({user_id, amount, reason}){
         try {
             amount = Number(amount);
             const year = getCurrentYear()
@@ -219,6 +219,39 @@ export class Service{
                 data: error
             };
         }
+    }
+
+     async uploadFile(file){
+        try {
+            return await this.bucket.createFile(
+                conf.appwriteBucketId,
+                ID.unique(),
+                file
+            )
+        } catch (error) {
+            console.log("Appwrite serive :: uploadFile :: error", error);
+            return false
+        }
+    }
+
+    async deleteFile(fileId){
+        try {
+            await this.bucket.deleteFile(
+                conf.appwriteBucketId,
+                fileId
+            )
+            return true
+        } catch (error) {
+            console.log("Appwrite serive :: deleteFile :: error", error);
+            return false
+        }
+    }
+
+    getFilePreview(fileId){
+        return this.bucket.getFilePreview(
+            conf.appwriteBucketId,
+            fileId
+        )
     }
 }
 

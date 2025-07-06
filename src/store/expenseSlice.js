@@ -6,6 +6,11 @@ export const saveExpense = createAsyncThunk('saveExpense', async (data) => {
     return addMonthlyData;
 });
 
+export const uploadExpenseReceipt = createAsyncThunk('uploadExpenseReceipt', async (data) => {
+    const receiptFileData = await appwriteService.uploadFile(data);
+    return receiptFileData;
+});
+
 export const fetchAllCurrentMonthExpenses = createAsyncThunk('fetchAllCurrentMonthExpenses', async (userId) => {
     const currentMonthExpenseData = await appwriteService.getAllCurrentMonthExpenses(userId);
     return currentMonthExpenseData;
@@ -24,7 +29,10 @@ const initialState = {
     currentMonthExpenseAmount: 0,
     expensesLoading: true,
     expenses: [],
-    totalExpenseCount: 0
+    totalExpenseCount: 0,
+    receiptUploadStatus: null,
+    receiptUploadError: null, 
+    receiptFileId: null 
 }
 
 const expenseSlice = createSlice({
@@ -34,6 +42,9 @@ const expenseSlice = createSlice({
         resetAddExpenseSuccess: (state) => {
             state.submit_sucess = false;
             state.success_message = null;
+            state.receiptUploadStatus = null;
+            state.receiptUploadError = null;
+            state.receiptFileId = null;
         }
     },
     extraReducers: (builder) => {
@@ -56,11 +67,25 @@ const expenseSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message;
             })
+            .addCase(uploadExpenseReceipt.pending, (state) => {
+                state.receiptUploadStatus = 'loading';
+            })
+            .addCase(uploadExpenseReceipt.fulfilled, (state, action) => {
+                console.log("===action.payload.data==", action.payload)
+                if(action.payload){
+                    state.receiptUploadStatus = 'success';
+                    state.receiptFileId = action.payload.$id;
+                }
+            })
+            .addCase(uploadExpenseReceipt.rejected, (state, action) => {
+                state.receiptUploadStatus = 'error';
+                state.receiptUploadError = action.error.message;
+            })
             .addCase(fetchAllCurrentMonthExpenses.pending, (state) => {
                 state.error = null;
             })
             .addCase(fetchAllCurrentMonthExpenses.fulfilled, (state, action) => {
-                if (action.payload.status && action.payload.data?.documents && action.payload.data.documents.length>0) {
+                if (action.payload.status && action.payload.data?.documents && action.payload.data.documents.length > 0) {
                     state.currentMonthExpenseAmount = action.payload.data.documents.reduce((sum, obj) => sum + obj.amount, 0);
                 }
             })
@@ -73,10 +98,10 @@ const expenseSlice = createSlice({
             })
             .addCase(getAllExpensesByYear.fulfilled, (state, action) => {
                 state.expensesLoading = false;
-                if (action.payload.status && action.payload.data?.documents && action.payload.data.documents.length>0) {
+                if (action.payload.status && action.payload.data?.documents && action.payload.data.documents.length > 0) {
                     state.expenses = action.payload.data.documents;
                     state.totalExpenseCount = action.payload.data.total;
-                }else{
+                } else {
                     state.expenses = [];
                     state.totalExpenseCount = 0;
                 }

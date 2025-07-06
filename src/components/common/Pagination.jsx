@@ -40,7 +40,7 @@ function Pagination({ totalExpenseCount, pageSize, currentPage, onPageChange }) 
                     );
                 })}
                 <button
-                    onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}
                 >

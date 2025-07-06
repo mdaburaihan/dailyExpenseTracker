@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from "react-hook-form"
 import { useSelector, useDispatch } from "react-redux";
-import { saveExpense, fetchAllCurrentMonthExpenses, resetAddExpenseSuccess } from '../store/expenseSlice';
+import { saveExpense, fetchAllCurrentMonthExpenses, resetAddExpenseSuccess, uploadExpenseReceipt } from '../store/expenseSlice';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { fetchMonthlyLimit } from '../store/monthlyLimitSlice';
 
 function AddExpense() {
+    const [selectedFileName, setSelectedFileName] = useState("");
     const dispatch = useDispatch();
     const { limit_amount } = useSelector((state) => state.monthlyLimit);
     const { currentMonthExpenseAmount } = useSelector((state) => state.expense);
@@ -15,22 +16,40 @@ function AddExpense() {
     const { loading, error, submit_sucess, success_message } = useSelector((state) => state.expense);
 
     const userData = useSelector((state) => state.auth.userData);
-     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({
         defaultValues: {
             amount: '',
-            reason: ''
+            reason: '',
+
         },
         mode: "onChange"
     });
 
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setSelectedFileName(e.target.files[0].name);
+        } else {
+            setSelectedFileName("");
+        }
+    };
 
-    const addExpense = (data) => {
+    const addExpense = async (data) => {
         try {
-            dispatch(saveExpense({ ...data, user_id: userData.$id, currentMonthExpenseAmount }));
-            dispatch(fetchMonthlyLimit(userData.$id));
-            dispatch(fetchAllCurrentMonthExpenses(userData.$id));
-            dispatch(resetMonthlyLimitSuccess());
+            let fileId = null;
+            if(data?.receipt?.length > 0){
+                const receiptData = data.receipt[0] ? await dispatch(uploadExpenseReceipt(data.receipt[0])).unwrap() : null;
+                if(receiptData){
+                    fileId = receiptData.$id;
+                }else{
+                    toast.error('File upload failed. Expense not saved.');
+                    return false;
+                }
+            }
+            await dispatch(saveExpense({ ...data, user_id: userData.$id, fileId })).unwrap();
+            await dispatch(fetchMonthlyLimit(userData.$id)).unwrap();
+            await dispatch(fetchAllCurrentMonthExpenses(userData.$id)).unwrap();
             reset();
+            setSelectedFileName("");
         } catch (error) {
             console.log(error)
             toast.error('Error: Something went wrong. Please try again.');
@@ -50,14 +69,15 @@ function AddExpense() {
     useEffect(() => {
         if (submit_sucess) {
             toast.success(success_message);
+            dispatch(resetAddExpenseSuccess());
         }
-    }, [submit_sucess]);
+    }, [submit_sucess, success_message]);
 
     return (
         <div className="w-full mx-auto">
-            <button type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Your have left Rs. {limit_amount-currentMonthExpenseAmount} to spend for this month</button>
+            <button type="button" className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Your have left Rs. {limit_amount - currentMonthExpenseAmount} to spend for this month</button>
             {!loading && <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mx-100" onSubmit={handleSubmit(addExpense)}>
-                 <div className="mb-4">
+                <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="amount">
                         Amount
                     </label>
@@ -72,11 +92,11 @@ function AddExpense() {
                             min: { value: 1, message: "Amount must be at least 1" },
                             valueAsNumber: true,
                             validate: (value) => {
-                                if(!Number.isFinite(value)){
+                                if (!Number.isFinite(value)) {
                                     return "Please enter a valid number";
                                 }
-                                if (value>limit_amount || value>limit_amount-currentMonthExpenseAmount) {
-                                  return "You have exceeded monthly limit.";
+                                if (value > limit_amount || value > limit_amount - currentMonthExpenseAmount) {
+                                    return "You have exceeded monthly limit.";
                                 }
                                 return true;
                             }
@@ -100,7 +120,27 @@ function AddExpense() {
                     />
                     {errors.reason && <p className="text-red-500 text-xs italic">{errors.reason.message}</p>}
                 </div>
-                 <div className="flex items-center justify-between">
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="file">
+                        Upload Receipt (optional)
+                    </label>
+                    <input
+                        id="file"
+                        type="file"
+                        accept="image/png, image/jpg, image/jpeg, image/gif"
+                        className="hidden"
+                        {...register("receipt")}
+                        onChange={handleFileChange}
+                    />
+                    <label
+                        htmlFor="file"
+                        className="inline-block px-1 py-1 border border-gray-400 bg-white text-gray-900 rounded cursor-pointer hover:bg-gray-100"
+                    >
+                        Choose File
+                    </label>
+                    <span className="ml-2 text-gray-600">{selectedFileName || "No file chosen"}</span>
+                </div>
+                <div className="flex items-center justify-between">
                     <button
                         className={`${isValid ? "bg-blue-500" : "bg-gray-500"} 
                         hover: ${isValid ? "bg-blue-700" : "bg-gray-700"}
