@@ -129,8 +129,11 @@ function AddExpense() {
                         type="file"
                         accept="image/png, image/jpg, image/jpeg, image/gif"
                         className="hidden"
-                        {...register("receipt")}
-                        onChange={handleFileChange}
+                        {...register("receipt", {
+                            onChange: (e) => {
+                                handleFileChange(e);
+                            }
+                        })}
                     />
                     <label
                         htmlFor="file"

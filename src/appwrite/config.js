@@ -181,12 +181,11 @@ export class Service{
         }
     }
 
-    async addExpense({user_id, amount, reason}){
+    async addExpense({user_id, amount, reason, fileId}){
         try {
             amount = Number(amount);
             const year = getCurrentYear()
             const month = getCurrentMonth()
-
             const data =  await this.databases.createDocument(
                 conf.appwriteExpenseTrackerDatabaseId,
                 conf.appwriteExpenseCollectionId,
@@ -196,7 +195,8 @@ export class Service{
                     amount,
                     reason,
                     year,
-                    month
+                    month,
+                    fileId
                 }
             )
 
