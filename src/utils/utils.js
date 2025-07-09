@@ -3,7 +3,7 @@ export const  getCurrentYear = () => {
 }
 
 export const  getCurrentMonth = () => {
-    return new Date().getMonth();
+    return new Date().getMonth()+1;
 }
 
 export const getMonthlyLimitSlug = (userId) => {

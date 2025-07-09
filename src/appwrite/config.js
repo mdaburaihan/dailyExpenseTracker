@@ -111,6 +111,34 @@ export class Service{
         }
     }
 
+    async getExpenseById(slug){
+        try {
+            const data = await this.databases.getDocument(
+                conf.appwriteExpenseTrackerDatabaseId,
+                conf.appwriteExpenseCollectionId,
+                slug
+            )
+
+            if(data){
+                return {
+                    status: true,
+                    data: data
+                };
+            }else{
+                return {
+                    status: false,
+                    data: "Error: Something went wrong. Please try again."
+                };
+            }
+        } catch (error) {
+            console.log("Appwrite serive :: getExpenseById :: error", error);
+            return {
+                status: false,
+                data: error
+            };
+        }
+    }
+
     async getAllCurrentMonthExpenses(user_id){
         try {
             const queries =  [
@@ -221,7 +249,45 @@ export class Service{
         }
     }
 
-     async uploadFile(file){
+    async updateExpense({user_id, amount, reason, year, month, fileId, expenseId}){
+        try {
+            amount = Number(amount);
+            const data =  await this.databases.updateDocument(
+                conf.appwriteExpenseTrackerDatabaseId,
+                conf.appwriteExpenseCollectionId,
+                expenseId,
+                {
+                    user_id,
+                    amount,
+                    reason,
+                    year,
+                    month,
+                    fileId
+                }
+            )
+
+            if(data){
+                return {
+                    status: true,
+                    data: data
+                };
+            }else{
+                return {
+                    status: false,
+                    data: "Error: Something went wrong. Please try again."
+                };
+            }
+            
+        } catch (error) {
+            console.log("Appwrite serive :: UpdateExpense :: error", error);
+            return {
+                status: false,
+                data: error
+            };
+        }
+    }
+
+    async uploadFile(file){
         try {
             return await this.bucket.createFile(
                 conf.appwriteBucketId,
@@ -233,6 +299,19 @@ export class Service{
             return false
         }
     }
+
+    async getUploadedFileById(fileId){
+        try {
+            return await this.bucket.getFile(
+                conf.appwriteBucketId,
+                fileId
+            )
+        } catch (error) {
+            console.log("Appwrite serive :: getUploadedFileById :: error", error);
+            return false
+        }
+    }
+
 
     async deleteFile(fileId){
         try {
