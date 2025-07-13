@@ -69,6 +69,10 @@ const expenseSlice = createSlice({
         },
         deleteExpenseReceipt: (state, action) => {
             return appwriteService.deleteFile(action.payload);
+        },
+        viewExpenseReceipt: (state, action) => {
+            const receiptViewData = appwriteService.getFileView(action.payload);
+            action.payload = receiptViewData;
         }
     },
     extraReducers: (builder) => {
@@ -174,5 +178,5 @@ const expenseSlice = createSlice({
     },
 });
 
-export const { resetAddExpenseSuccess, downloadExpenseReceipt, deleteExpenseReceipt } = expenseSlice.actions;
+export const { resetAddExpenseSuccess, downloadExpenseReceipt, deleteExpenseReceipt, viewExpenseReceipt } = expenseSlice.actions;
 export default expenseSlice.reducer;

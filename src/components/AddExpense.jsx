@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from "react-hook-form"
 import { useSelector, useDispatch } from "react-redux";
-import { saveExpense,updateExpense, deleteExpenseReceipt, getExpenseById, getReceiptById, fetchAllCurrentMonthExpenses, resetAddExpenseSuccess, uploadExpenseReceipt } from '../store/expenseSlice';
+import { saveExpense, updateExpense, deleteExpenseReceipt,viewExpenseReceipt, getExpenseById, getReceiptById, fetchAllCurrentMonthExpenses, resetAddExpenseSuccess, uploadExpenseReceipt } from '../store/expenseSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { fetchMonthlyLimit } from '../store/monthlyLimitSlice';
@@ -63,6 +63,15 @@ function AddExpense() {
         }
     };
 
+    const handleViewReceipt = (fileId) => {
+        let receiptViewResp = dispatch(viewExpenseReceipt(fileId))
+        if(receiptViewResp?.payload){
+            window.open(receiptViewResp.payload, "_blank");
+        }else{
+            toast.error('Error fetching receipt. Please try again later.');
+        }     
+    }
+
     const addUpdateExpense = async (data) => {
         try {
             if (expenseId && expense.fileId && data?.receipt?.length > 0) {
@@ -81,12 +90,12 @@ function AddExpense() {
             }
 
             if (expenseId) {
-                await dispatch(updateExpense({ 
-                    ...data, 
+                await dispatch(updateExpense({
+                    ...data,
                     user_id: userData.$id,
-                    year: expense.year, 
-                    month: expense.month,  
-                    expenseId, 
+                    year: expense.year,
+                    month: expense.month,
+                    expenseId,
                     fileId: (fileId) ? fileId : expense.fileId
                 })).unwrap();
             } else {
@@ -98,7 +107,7 @@ function AddExpense() {
             reset();
             setSelectedFileName("");
 
-            if(expenseId){
+            if (expenseId) {
                 navigate('/view-expenses');
             }
         } catch (error) {
@@ -211,7 +220,19 @@ function AddExpense() {
                                 >
                                     Choose File
                                 </label>
+                                <br /><br />
                                 <span className="ml-2 text-gray-600">{selectedFileName || "No file chosen"}</span>
+                                <br /><br />
+                                {(expenseId && expense?.fileId) ? (
+                                    <button 
+                                        type="button" 
+                                        onClick={()=>handleViewReceipt(expense.fileId)} 
+                                        className="bg-green-500 hover:bg-green-700 cursor-pointer text-white py-2 px-4 rounded-full">
+                                       View
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                             <div className="flex items-center justify-between">
                                 <button

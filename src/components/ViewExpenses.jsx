@@ -106,7 +106,7 @@ function ViewExpenses() {
                                         <td className="px-6 py-4">{item.reason}</td>
                                         <td className="px-6 py-4">
                                             {item.fileId ? (
-                                                <button onClick={()=>handleReceiptDownload(item.fileId)} className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-2 border border-blue-500 hover:border-transparent rounded">
+                                                <button onClick={()=>handleReceiptDownload(item.fileId)} className="bg-transparent cursor-pointer hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-2 border border-blue-500 hover:border-transparent rounded">
                                                     Download
                                                 </button>
                                             ) : (
@@ -115,11 +115,11 @@ function ViewExpenses() {
                                         </td>
                                         <td className="px-6 py-4">
                                             {(currentMonth === item.month && currentYear === item.year) ? (
-                                            <button onClick={()=>handleExpenseEdit(item)} className="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-2 border border-green-500 hover:border-transparent rounded">
+                                            <button onClick={()=>handleExpenseEdit(item)} className="bg-transparent cursor-pointer hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-2 border border-green-500 hover:border-transparent rounded">
                                                 Edit
                                             </button>):""}
                                             <span className="px-2"></span>
-                                            <button onClick={()=>handleReceiptDownload(item.fileId)} className="bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-2 border border-red-500 hover:border-transparent rounded">
+                                            <button onClick={()=>handleReceiptDownload(item.fileId)} className="bg-transparent cursor-pointer hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-2 border border-red-500 hover:border-transparent rounded">
                                                 Delete
                                             </button>
                                         </td>

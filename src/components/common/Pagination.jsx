@@ -18,7 +18,7 @@ function Pagination({ totalExpenseCount, pageSize, currentPage, onPageChange }) 
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}
+                    className={`cursor-pointer relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}
                 >
                     <span className="sr-only">Previous</span>
                     &lt;
@@ -29,7 +29,7 @@ function Pagination({ totalExpenseCount, pageSize, currentPage, onPageChange }) 
                         <button
                             key={page}
                             onClick={() => onPageChange(page)}
-                            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${page === currentPage
+                            className={`cursor-pointer relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${page === currentPage
                                 ? 'bg-indigo-600 text-white'
                                 : 'bg-white text-gray-700 hover:bg-gray-50'
                                 }`}
@@ -42,7 +42,7 @@ function Pagination({ totalExpenseCount, pageSize, currentPage, onPageChange }) 
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}
+                    className={`cursor-pointer relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}
                 >
                     <span className="sr-only">Next</span>
                     &gt;
